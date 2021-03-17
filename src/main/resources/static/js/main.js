@@ -11,6 +11,11 @@ var connectingElement = document.querySelector('.connecting');
 var stompClient = null;
 var username = null;
 
+var getSavedList = [];
+var alreadyExistList = [];
+var finalList = [];
+
+
 var colors = [
     '#2196F3', '#32c787', '#00BCD4', '#ff5652',
     '#ffc107', '#ff85af', '#FF9800', '#39bbb0'
@@ -68,9 +73,30 @@ function sendMessage(event) {
     event.preventDefault();
 }
 
+function messageSynchronization(message) {
+    if(Array.isArray(message)) {
+        for (step = 0; step < message.length; step++) {
+              getSavedList.push(message[i]);
+        }
+    } else {
+       alreadyExistList.push(message)
+    }
+
+    for (step1 = 0; step1 < alreadyExistList.length; step1++) {
+          for (step2 = 0; step2 < getSavedList.length; step2++) {
+                   if(alreadyExistList[step1].id === getSavedList[step2].id) {
+                        finalList.push(getSavedList[step2].id);
+                        }
+                    }
+            }
+    return finalList;
+}
+// 기존데이터 뿌려줄떄 type => existCHAT
 
 function onMessageReceived(payload) {
     var message = JSON.parse(payload.body);
+
+    var finalList =  messageSynchronization(message);
 
     var messageElement = document.createElement('li');
 
@@ -107,6 +133,7 @@ function onMessageReceived(payload) {
 }
 
 
+
 function getAvatarColor(messageSender) {
     var hash = 0;
     for (var i = 0; i < messageSender.length; i++) {
@@ -118,3 +145,4 @@ function getAvatarColor(messageSender) {
 
 usernameForm.addEventListener('submit', connect, true)
 messageForm.addEventListener('submit', sendMessage, true)
+// page reload 시
